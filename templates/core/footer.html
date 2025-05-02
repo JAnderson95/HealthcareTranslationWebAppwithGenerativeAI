@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <footer class="bg-light text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy ; {% now "Y" %} Healthcare Translator</p>
+            <a href="{% url 'privacy' %}" class="text-muted"> privacy Policy</a>
+        </div>
+    </footer>
+
+
+    {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // DOM element
+            const startRecordBtn = document.getElementById('startRecord');
+            const originalText = document.getElementById('originalText');
+            const translatedText = document.getElementById('translatedText');
+            const translateBtn = document.getElementById('translateBtn');
+            const playTranslationBtn = document.getElementById('playTranslation');
+            const inputLanguage = document.getElementById('inputLanguage');
+            const outputLanguage = document.getElementById('outputLanguage');
+            const voiceErrorElement = document.getElementById('voiceError');
+
+            // ==================== VOICE RECOGNITION ==================== //
+
+            let recognition;
+            let isRecording = false;
+
+            // verifying the voice recognition support
+            function initializeVoiceRecognition() {
+                if ('webkitSpeechRecognition' in window) {
+                    recognition = new webkitSpeechRecognition();
+
+                    // Configuración mejorada
+                    recognition.continuous = false;  
+                    recognition.interimResults = false;  
+                    recognition.lang = inputLanguage.value;
+                    recognition.maxAlternatives = 1;  
+                    recognition.onstart = function () {
+                        isRecording = true;
+                        startRecordBtn.innerHTML = '<i class="bi bi-mic-mute"></i> Stop';
+                        startRecordBtn.classList.remove('btn-light');
+                        startRecordBtn.classList.add('btn-danger');
+                        originalText.placeholder = "Speak Now...";
+
+                        // Setting up a 10 seconds timeout
+                        recognition.stopTimeout = setTimeout(() => {
+                            if (isRecording) {
+                                recognition.stop();
+                                showError('Recording time exceeded (10 seconds)');
+                            }
+                        }, 10000);
+                    };
+
+                    recognition.onresult = function (event) {
+                        clearTimeout(recognition.stopTimeout); 
+                        const transcript = event.results[0][0].transcript;
+                        originalText.value = transcript;
+                        stopRecording();
+                    };
+
+                    recognition.onerror = function (event) {
+                        clearTimeout(recognition.stopTimeout);  
+                        console.error('Error en reconocimiento:', event.error);
+
+                        const errorMessages = {
+                            'no-speech': 'Cannot detect any voice. Speak clear and louder to the mic.',
+                            'audio-capture': 'Cannot access to the mic. check permissions.',
+                            'not-allowed': 'Permission to access the mic was denied . Update permissions.',
+                            'network': 'Network Error. Check internet connection.',
+                            'service-not-allowed': 'Voice service not available at the moment.'
+                        };
+
+                        showError(errorMessages[event.error] || 'Error while recognizing the voice');
+                        stopRecording();
+                    };
+
+                    recognition.onend = function () {
+                        clearTimeout(recognition.stopTimeout);
+                        if (isRecording) {
+                            if (!originalText.value) {
+                                showError('No se detectó voz. Intenta nuevamente.');
+                            }
+                            stopRecording();
+                        }
+                    };
+                } else {
+                    startRecordBtn.disabled = true;
+                    startRecordBtn.title = "Voice recognition not supported";
+                    showError("Your browser does not recognize voice recognition . Use Chrome or Edge.");
+                }
+            }
+            function stopRecording() {
+                isRecording = false;
+                startRecordBtn.innerHTML = '<i class="bi bi-mic"></i> Speak';
+                startRecordBtn.classList.remove('btn-danger');
+                startRecordBtn.classList.add('btn-light');
+                originalText.placeholder = "Speak or write here...";
+            }
+
+            startRecordBtn.addEventListener('click', function () {
+                if (!recognition) return;
+
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    originalText.value = '';
+                    recognition.lang = inputLanguage.value;
+                    recognition.start();
+                }
+            });
+
+            // ==================== TEXT TRANSLATION ==================== //
+            translateBtn.addEventListener('click', async function () {
+                const text = originalText.value.trim();
+                if (!text) {
+                    showError('Please write or send a voice text');
+                    return;
+                }
+
+                // Disable the button during translation
+                translateBtn.disabled = true;
+                translateBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Translating...';
+
+                try {
+                    const response = await fetch(window.location.href, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': getCsrfToken()
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            input_lang: inputLanguage.value,
+                            output_lang: outputLanguage.value
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(await response.text());
+                    }
+
+                    const data = await response.json();
+                    translatedText.value = data.translated;
+                    playTranslationBtn.disabled = false;
+
+                } catch (error) {
+                    console.error('Error al traducir:', error);
+                    showError('Error al traducir. Por favor intenta nuevamente.');
+                } finally {
+                    translateBtn.disabled = false;
+                    translateBtn.innerHTML = '<i class="bi bi-translate"></i> Translate';
+                }
+            });
+
+            // ==================== REPRODUCCIÓN DE AUDIO ==================== //
+            playTranslationBtn.addEventListener('click', function () {
+                const text = translatedText.value;
+                if (!text) return;
+
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = outputLanguage.value;
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    showError('Speech synthesis is not supported in your browser');
+                }
+            });
+
+            // ==================== Aux Function==================== //
+
+            function getCsrfToken() {
+                const cookieValue = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('csrftoken='))
+                    ?.split('=')[1];
+                return cookieValue || '';
+            }
+
+            function showError(message) {
+                if (voiceErrorElement) {
+                    voiceErrorElement.textContent = message;
+                    voiceErrorElement.style.display = 'block';
+                    setTimeout(() => {
+                        voiceErrorElement.style.display = 'none';
+                    }, 5000);
+                } else {
+                    alert(message);
+                }
+            }
+
+            // ==================== initialization ==================== //
+            initializeVoiceRecognition();
+
+            // Update the language coming from voice recon when changes
+            inputLanguage.addEventListener('change', function () {
+                if (recognition) {
+                    recognition.lang = this.value;
+                }
+            });
+        });
+    </script>
+    {% endblock %}
+</body>
+
+</html>

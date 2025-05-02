@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    {% extends 'core/base.html' %}
+    {% load crispy_forms_tags %}
+
+    {% block content %}
+    <div class="container mt-5">
+        <h2 class="mb-4">HealthCare Translator</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <select id="inputLanguage" class="form-select">
+                                    {% for code, name in languages %}
+                                    <option value="{{ code }}" {% if code == last_input_lang %}selected{% endif %}>{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button id="startRecord" class="btn btn-light">
+                                    <i class="bi bi-mic"></i> Speak
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="originalText" class="form-control" rows="6"
+                            placeholder="Speak or write here ...."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <select id="outputLanguage" class="form-select">
+                                    {% for code, name in languages %}
+                                    <option value="{{ code }}" {% if code == last_output_lang %}selected{% endif %}>{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button id="playTranslation" class="btn btn-light" disabled>
+                                    <i class="bi bi-play-circle"></i> Listen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="translatedText" class="form-control" rows="6" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-3">
+            <button id="translateBtn" class="btn btn-primary btn-lg">
+                <i class="bi bi-translate"></i> Translate
+            </button>
+        </div>
+
+        <div class="alert alert-info mt-4">
+            <small>
+                <strong>Nota:</strong> To use the voice recognition:
+                <ul>
+                    <li>Use Chrome o Edge</li>
+                    <li> Be sure to allow the access to the microphone</li>
+                    <li> Speak clear after clicking  on 'speak'</li>
+                </ul>
+            </small>
+        </div>
+    </div>
+    {% endblock %}
+
+
+</body>
+
+</html>
