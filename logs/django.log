@@ -3735,3 +3735,16 @@ INFO 2025-05-01 23:58:47,304 basehttp "GET / HTTP/1.1" 200 13096
 INFO 2025-05-01 23:58:50,277 basehttp "GET /translate/ HTTP/1.1" 200 17787
 INFO 2025-05-01 23:59:07,487 basehttp "POST /translate/ HTTP/1.1" 200 65
 INFO 2025-05-02 01:17:22,820 autoreload Watching for file changes with StatReloader
+INFO 2025-05-02 01:17:58,121 basehttp "GET / HTTP/1.1" 200 11725
+INFO 2025-05-02 01:17:59,184 basehttp "GET /accounts/login/ HTTP/1.1" 200 13001
+INFO 2025-05-02 01:18:08,272 basehttp "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-05-02 01:18:08,278 basehttp "GET / HTTP/1.1" 200 13096
+INFO 2025-05-02 01:18:09,364 basehttp "GET /translate/ HTTP/1.1" 200 17787
+INFO 2025-05-02 01:18:15,282 basehttp "POST /translate/ HTTP/1.1" 200 79
+INFO 2025-05-02 01:19:10,335 basehttp "GET / HTTP/1.1" 200 13096
+INFO 2025-05-02 01:19:11,517 basehttp "GET /translate/ HTTP/1.1" 200 17787
+INFO 2025-05-02 01:19:21,474 basehttp "POST /translate/ HTTP/1.1" 200 81
+INFO 2025-05-02 01:43:27,607 autoreload C:\Users\javie\OneDrive\Escritorio\healthcaretranslationwebappwithgenerativeAI\healthcare\settings.py changed, reloading.
+INFO 2025-05-02 01:43:28,106 autoreload Watching for file changes with StatReloader
+INFO 2025-05-02 01:44:02,917 autoreload C:\Users\javie\OneDrive\Escritorio\healthcaretranslationwebappwithgenerativeAI\healthcare\settings.py changed, reloading.
+INFO 2025-05-02 01:44:03,638 autoreload Watching for file changes with StatReloader

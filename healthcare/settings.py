@@ -28,7 +28,10 @@ SECRET_KEY = 'django-insecure-w_wg-08=d^u8h@7swl@cbp4!6vd(fonjxdx@72)3(0vegtc+sp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'healthcaretranslationwebappwithgenerativ.onrender.com', #Domain
+    'localhost', #localhost for development
+]
 
 
 # Application definition
