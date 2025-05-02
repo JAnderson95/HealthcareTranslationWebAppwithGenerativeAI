@@ -3734,3 +3734,4 @@ INFO 2025-05-01 23:27:38,981 basehttp "GET / HTTP/1.1" 200 11725
 INFO 2025-05-01 23:58:47,304 basehttp "GET / HTTP/1.1" 200 13096
 INFO 2025-05-01 23:58:50,277 basehttp "GET /translate/ HTTP/1.1" 200 17787
 INFO 2025-05-01 23:59:07,487 basehttp "POST /translate/ HTTP/1.1" 200 65
+INFO 2025-05-02 01:17:22,820 autoreload Watching for file changes with StatReloader
